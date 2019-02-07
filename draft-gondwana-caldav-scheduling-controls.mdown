@@ -37,7 +37,7 @@ behaviour of CalDAV servers when updating calendaring resources.
 # Introduction
 
 [@!RFC6638] defines automatic scheduling operations for resources stored
-on [@RFC4719] CalDAV servers.
+on [@RFC4791] CalDAV servers.
 
 [@!RFC6638] defines the `Schedule-Reply` header in Section 8.1,
 however this header is not sufficient for controlling scheduling in all
