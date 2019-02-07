@@ -84,20 +84,20 @@ the requirements specified in this document.
 
 ## Example: Using OPTIONS for the Discovery of Scheduling Controls Support
 
-   >> Request <<
+Request:
 
-   OPTIONS /home/brong/calendars/ HTTP/1.1
-   Host: cal.example.com
+    OPTIONS /home/brong/calendars/ HTTP/1.1
+    Host: cal.example.com
 
-   >> Response <<
+Response:
 
-   HTTP/1.1 200 OK
-   Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, COPY, MOVE
-   Allow: PROPFIND, PROPPATCH, LOCK, UNLOCK, REPORT, ACL
-   DAV: 1, 2, 3, access-control, calendar-access,
-    scheduling-controls
-   Date: Thu, 8 Feb 2019 10:16:37 GMT
-   Content-Length: 0
+    HTTP/1.1 200 OK
+    Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, COPY, MOVE
+    Allow: PROPFIND, PROPPATCH, LOCK, UNLOCK, REPORT, ACL
+    DAV: 1, 2, 3, access-control, calendar-access,
+     scheduling-controls
+    Date: Thu, 8 Feb 2019 10:16:37 GMT
+    Content-Length: 0
 
 # New headers
 
