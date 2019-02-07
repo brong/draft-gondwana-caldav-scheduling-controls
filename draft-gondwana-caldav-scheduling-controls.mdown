@@ -1,0 +1,184 @@
+%%%
+    title = "CalDAV Extension for scheduling controls"
+    abbrev = "CalDAV SchedControl"
+    category = "std"
+    docName = "draft-gondwana-caldav-scheduling-controls-00"
+    updates = [6638]
+    ipr= "trust200902"
+    area = "Applications"
+    workgroup = "calext"
+    keyword = ["CalDAV", "Calendar", "Scheduling"]
+
+    date = 2019-02-08T00:00:00Z
+
+    [[author]]
+    initials="B."
+    surname="Gondwana"
+    fullname="Bron Gondwana"
+    role="editor"
+    organization = "FastMail"
+        [author.address]
+        email = "brong@fastmailteam.com"
+        uri = "https://www.fastmail.com"
+        [author.address.postal]
+            street = "Level 2, 114 William St"
+            city = "Melbourne"
+            code = "VIC 3000"
+            country = "Australia"
+%%%
+
+.# Abstract
+
+This document adds headers to control and restrict the scheduling
+behaviour of CalDAV servers when updating calendaring resources.
+
+{mainmatter}
+
+# Introduction
+
+[@!RFC6638] defines automatic scheduling operations for resources stored
+on [@RFC4719] CalDAV servers.
+
+[@!RFC6638] defines the `Schedule-Reply` header in Section 8.1,
+however this header is not sufficient for controlling scheduling in all
+cases.
+
+Cases where it might be necessary to update the data store on a server without
+causing scheduling messages to be sent include backup after a data loss event
+on the server, or importing calendar events from another system.
+
+Calendar server operators deal with these other needs by either using
+a different method than CalDAV to update their server, or by adding a
+custom method to suppress scheduling.  This document defines a standard
+method to suppress scheduling, allowing CalDAV to be directly used for
+restores and imports.
+
+Complex sites can have users who have multiple aliases, and in the most
+complex cases, a user may have multiple identities who are present on a
+scheduling event as organizer and/or attendee.  When an event is updated
+over CalDAV, the server must calculate or guess which of those addresses
+the current user is acting as.  This document defines a header which
+allows the client to inform the server precisely which address they are
+acting as when adding, modifying or removing a resource.
+
+
+# Conventions Used In This Document
+
+In examples, "C:" indicates data sent by a client that is connected
+to a server. "S:" indicates data sent by the server to the client.
+
+The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**",
+"**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**",
+"**MAY**", and "**OPTIONAL**" in this document are to be interpreted as
+described in [@!RFC2119] when they appear in ALL CAPS.  These words may
+also appear in this document in lower case as plain English words,
+absent their normative meanings.
+
+# Extending the CalDAV OPTIONS response
+
+A server supporting the features described in this document MUST
+include "scheduling-controls" as a field in the DAV response header
+from an OPTIONS request.  A value of "scheduling-controls" in the
+DAV response header indicates to clients that the server supports all
+the requirements specified in this document.
+
+## Example: Using OPTIONS for the Discovery of Scheduling Controls Support
+
+   >> Request <<
+
+   OPTIONS /home/brong/calendars/ HTTP/1.1
+   Host: cal.example.com
+
+   >> Response <<
+
+   HTTP/1.1 200 OK
+   Allow: OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, COPY, MOVE
+   Allow: PROPFIND, PROPPATCH, LOCK, UNLOCK, REPORT, ACL
+   DAV: 1, 2, 3, access-control, calendar-access,
+    scheduling-controls
+   Date: Thu, 8 Feb 2019 10:16:37 GMT
+   Content-Length: 0
+
+# New headers
+
+This document adds two new headers for use on PUT, PROPPATCH and DELETE:
+
+## Scheduling header
+
+Scheduling: {all|none|internal-only|external-only|X-...}
+
+Default: all
+
+Not providing this header, or providing the value of "all", instructs the
+server to follow the behaviour in [@RFC6638] Section 3.2.
+
+Providing the value "none" instructs the server to perform no scheduling
+at all, and to just store the event (useful for restoring from backup)
+
+The value "internal-only" instructs the server to update the events in
+other calendars within its system where that can be done silently, but not
+to send visible notifications to users (where permitted by policy).  This
+is useful when importing multiple related calendars into a new system
+without flooding external parties with notifications.
+
+The value "external-only" instructs the server to import the data without
+updating local calendars, but to send notifications to external attendees
+so they are aware of the event.  This is useful when migrating calendar
+events to a new system where external parties need to have a way to update
+their participation status in the new system.
+
+e.g.
+
+    Scheduling: none
+
+TODO: specify error codes
+
+## Schedule-User-Address header
+
+Schedule-User-Address: URI
+
+Default: not present
+
+If this header is not present, the server will calculate the address from
+the authenticated user, or from the CALDAV:schedule-user-address property
+on the calendar or principal.
+
+If this header is provided, it overrides the server's internal calculation,
+and informs the server to perform any scheduling as the specified user.
+
+TODO: specify error codes
+
+e.g.
+
+    Schedule-User-Address: mailto:foo@example.com
+
+# Implementation considerations
+
+Any server implementing this extension MUST ensure it has a way to validate
+Schedule-User-Address settings.
+
+# IANA Considerations
+
+TODO: IANA request for OPTIONS item
+
+TODO: IANA request for named headers
+
+# Security Considerations
+
+The "Scheduling" header only allows reduction of the cases in which the
+server will creating scheduling requests.  This is generally good for user
+privacy, allowing copies of events to be updated without notifying the
+owner or attendees.  This is particularly valuable for cleaning up spam.
+
+The "Schedule-User-Address" header allows the client to override the
+server choice of address for the user to act as.  Servers MUST
+ensure that the authenticated user has permission to act as the specified
+address, as well as applying any local policy limitations.
+
+# Acknowledgments
+
+* Lucia Federova, Google
+* CalConnect
+* The calext working group
+
+{backmatter}
