@@ -2,14 +2,14 @@
     title = "CalDAV Extension for scheduling controls"
     abbrev = "CalDAV SchedControl"
     category = "std"
-    docName = "draft-gondwana-caldav-scheduling-controls-00"
+    docName = "draft-gondwana-caldav-scheduling-controls-01"
     updates = [6638]
     ipr= "trust200902"
     area = "Applications"
     workgroup = "calext"
     keyword = ["CalDAV", "Calendar", "Scheduling"]
 
-    date = 2019-02-08T00:00:00Z
+    date = 2019-03-08T00:00:00Z
 
     [[author]]
     initials="B."
@@ -177,8 +177,20 @@ address, as well as applying any local policy limitations.
 
 # Acknowledgments
 
-* Lucia Federova, Google
+* Lucia Kristiansen, Google
 * CalConnect
 * The calext working group
+
+# Version History
+
+Remove before publishing
+
+## v01, 2019-03-08
+
+* correct name in acknowledgements
+
+## v00, 2019-02-08
+
+* Initial draft based on discussion at CalConnect about Google and FastMail private implementations.
 
 {backmatter}
